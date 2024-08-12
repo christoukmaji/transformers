@@ -858,6 +858,9 @@ class MistralModel(MistralPreTrainedModel):
 
         if self._attn_implementation == "flash_attention_2":
             if attention_mask is not None and use_cache:
+                print(attention_mask)
+                print(input_tensor)
+                assert False
                 is_padding_right = attention_mask[:, -1].sum().item() != input_tensor.size()[0]
                 if is_padding_right:
                     raise ValueError(
