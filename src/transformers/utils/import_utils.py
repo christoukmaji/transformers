@@ -851,6 +851,29 @@ def is_bitsandbytes_available():
     return _bitsandbytes_available and torch.cuda.is_available()
 
 
+def is_flash_attn_1_available():
+    if not is_torch_available():
+        return False
+
+    if not _is_package_available("flash_attn"):
+        return False
+
+    # Let's add an extra check to see if cuda is available
+    import torch
+
+    if not (torch.cuda.is_available() or is_torch_mlu_available()):
+        return False
+
+    if torch.version.cuda:
+        return version.parse(importlib.metadata.version("flash_attn")) <= version.parse("2.0.0")
+    elif torch.version.hip:
+        # TODO: Bump the requirement to 2.1.0 once released in https://github.com/ROCmSoftwarePlatform/flash-attention
+        return version.parse(importlib.metadata.version("flash_attn")) <= version.parse("2.0.0")
+    elif is_torch_mlu_available():
+        return version.parse(importlib.metadata.version("flash_attn")) <= version.parse("2.0.0")
+    else:
+        return False
+
 def is_flash_attn_2_available():
     if not is_torch_available():
         return False
