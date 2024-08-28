@@ -24,7 +24,8 @@ from .utils import is_flash_attn_1_available, is_flash_attn_2_available, is_flas
 
 
 if is_flash_attn_1_available():
-    from flash_attn import flash_attn_func, flash_attn_unpadded_func
+    from flash_attn.flash_attn_triton import flash_attn_func
+    from flash_attn.flash_attn_interface import flash_attn_unpadded_func
 
 if is_flash_attn_2_available():
     from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input  # noqa
