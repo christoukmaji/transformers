@@ -27,6 +27,8 @@ if is_flash_attn_1_available():
     from flash_attn.flash_attn_triton import flash_attn_func
     from flash_attn.flash_attn_interface import flash_attn_unpadded_func
 
+    _flash_supports_window_size = "window_size" in list(inspect.signature(flash_attn_func).parameters)
+
 if is_flash_attn_2_available():
     from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input  # noqa
     from flash_attn import flash_attn_func, flash_attn_varlen_func
