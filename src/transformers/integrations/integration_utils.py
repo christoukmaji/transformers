@@ -503,7 +503,7 @@ def run_hp_search_wandb(trainer, n_trials: int, direction: str, **kwargs) -> Bes
 
         # free GPU memory
         import gc
-        del trainer.model
+        #del trainer.model
         gc.collect()
         torch.cuda.empty_cache()
 
