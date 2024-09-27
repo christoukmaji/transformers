@@ -550,9 +550,19 @@ def run_hp_search_wandb(trainer, n_trials: int, direction: str, **kwargs) -> Bes
         run.config.update({"assignments": {}, "metric": metric})
         config = wandb.config
 
+        # Resuming from checkpoint if available
+        checkpoint = trainer.state.best_model_checkpoint if trainer.state.best_model_checkpoint else None
+
+        # free GPU memory
+        import gc
+        if not checkpoint:
+            del trainer.model
+            gc.collect()
+            torch.cuda.empty_cache()
+
         trainer.objective = None
 
-        trainer.train(resume_from_checkpoint=None, trial=vars(config)["_items"])
+        trainer.train(resume_from_checkpoint=checkpoint, trial=vars(config)["_items"])
         # If there hasn't been any evaluation during the training loop.
         if getattr(trainer, "objective", None) is None:
             metrics = trainer.evaluate()
