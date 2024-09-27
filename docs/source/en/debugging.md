@@ -136,7 +136,7 @@ This means your GPU architecture is `8.6`.
 
 If you get `8, 6`, then you can set `TORCH_CUDA_ARCH_LIST="8.6"`. For multiple GPUs with different architectures, list them like `TORCH_CUDA_ARCH_LIST="6.1;8.6"`.
 
-It is also possible to not specifiy `TORCH_CUDA_ARCH_LIST` and the build program automatically queries the GPU architecture of the build. However, it may or may not match the actual GPU on the target machine which is why it is better to explicitly specfify the correct architecture.
+It is also possible to not specify `TORCH_CUDA_ARCH_LIST` and the build program automatically queries the GPU architecture of the build. However, it may or may not match the actual GPU on the target machine which is why it is better to explicitly specify the correct architecture.
 
 For training on multiple machines with the same setup, you'll need to make a binary wheel:
 
@@ -203,7 +203,7 @@ This feature can be used with any `nn.Module`-based model.
 
 </Tip>
 
-If you start getting `loss=NaN` or the model inhibits some other abnormal behavior due to `inf` or `nan` in
+If you start getting `loss=NaN` or the model exhibits some other abnormal behavior due to `inf` or `nan` in
 activations or weights one needs to discover where the first underflow or overflow happens and what led to it. Luckily
 you can accomplish that easily by activating a special module that will do the detection automatically.
 

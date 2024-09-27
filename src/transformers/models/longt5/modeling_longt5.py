@@ -12,8 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" PyTorch LongT5 model."""
-
+"""PyTorch LongT5 model."""
 
 import copy
 import math
@@ -25,6 +24,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from ...activations import ACT2FN
+from ...generation import GenerationMixin
 from ...modeling_outputs import (
     BaseModelOutput,
     BaseModelOutputWithPastAndCrossAttentions,
@@ -51,12 +51,6 @@ _CONFIG_FOR_DOC = "LongT5Config"
 _CHECKPOINT_FOR_DOC = "google/long-t5-local-base"
 
 # TODO: Update before the merge
-LONGT5_PRETRAINED_MODEL_ARCHIVE_LIST = [
-    "google/long-t5-local-base",
-    "google/long-t5-local-large",
-    "google/long-t5-tglobal-base",
-    "google/long-t5-tglobal-large",
-]
 
 
 def _pad_to_multiple(x: torch.Tensor, block_len: int, dim: int, pad_value: int = 0) -> torch.Tensor:
@@ -1301,6 +1295,8 @@ class LongT5PreTrainedModel(PreTrainedModel):
             # Mesh TensorFlow embeddings initialization
             # See https://github.com/tensorflow/mesh/blob/fa19d69eafc9a482aff0b59ddd96b025c0cb207d/mesh_tensorflow/layers.py#L1624
             module.shared.weight.data.normal_(mean=0.0, std=factor * 1.0)
+            if hasattr(module, "lm_head") and not self.config.tie_word_embeddings:
+                module.lm_head.weight.data.normal_(mean=0.0, std=factor * 1.0)
         elif isinstance(module, LongT5DenseActDense):
             # Mesh TensorFlow FF initialization
             # See https://github.com/tensorflow/mesh/blob/master/mesh_tensorflow/transformer/transformer_layers.py#L56
@@ -1905,7 +1901,7 @@ class LongT5Model(LongT5PreTrainedModel):
 
 
 @add_start_docstrings("""LONGT5 Model with a `language modeling` head on top.""", LONGT5_START_DOCSTRING)
-class LongT5ForConditionalGeneration(LongT5PreTrainedModel):
+class LongT5ForConditionalGeneration(LongT5PreTrainedModel, GenerationMixin):
     _keys_to_ignore_on_load_unexpected = [
         r"decoder.block.0.layer.1.EncDecAttention.relative_attention_bias.weight",
     ]

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" PyTorch Speech2Text model."""
+"""PyTorch Speech2Text model."""
 
 import math
 from typing import Optional, Tuple, Union
@@ -22,6 +22,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss
 
 from ...activations import ACT2FN
+from ...generation import GenerationMixin
 from ...modeling_attn_mask_utils import _prepare_4d_attention_mask, _prepare_4d_causal_attention_mask
 from ...modeling_outputs import (
     BaseModelOutput,
@@ -42,12 +43,6 @@ from .configuration_speech_to_text import Speech2TextConfig
 logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "Speech2TextConfig"
-
-
-SPEECH_TO_TEXT_PRETRAINED_MODEL_ARCHIVE_LIST = [
-    "facebook/s2t-small-librispeech-asr",
-    # See all Speech2Text models at https://huggingface.co/models?filter=speech_to_text
-]
 
 
 # Copied from transformers.models.bart.modeling_bart.shift_tokens_right
@@ -130,8 +125,8 @@ class Speech2TextSinusoidalPositionalEmbedding(nn.Module):
         """
         half_dim = embedding_dim // 2
         emb = math.log(10000) / (half_dim - 1)
-        emb = torch.exp(torch.arange(half_dim, dtype=torch.float) * -emb)
-        emb = torch.arange(num_embeddings, dtype=torch.float).unsqueeze(1) * emb.unsqueeze(0)
+        emb = torch.exp(torch.arange(half_dim, dtype=torch.int64).float() * -emb)
+        emb = torch.arange(num_embeddings, dtype=torch.int64).float().unsqueeze(1) * emb.unsqueeze(0)
         emb = torch.cat([torch.sin(emb), torch.cos(emb)], dim=1).view(num_embeddings, -1)
         if embedding_dim % 2 == 1:
             # zero pad
@@ -1213,7 +1208,7 @@ class Speech2TextModel(Speech2TextPreTrainedModel):
     "The Speech2Text Model with a language modeling head. Can be used for summarization.",
     SPEECH_TO_TEXT_START_DOCSTRING,
 )
-class Speech2TextForConditionalGeneration(Speech2TextPreTrainedModel):
+class Speech2TextForConditionalGeneration(Speech2TextPreTrainedModel, GenerationMixin):
     base_model_prefix = "model"
     _tied_weights_keys = ["lm_head.weight"]
 

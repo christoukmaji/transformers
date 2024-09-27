@@ -185,7 +185,7 @@ class ResnetModelForImageClassification(PreTrainedModel):
     def forward(self, tensor, labels=None):
         logits = self.model(tensor)
         if labels is not None:
-            loss = torch.nn.cross_entropy(logits, labels)
+            loss = torch.nn.functional.cross_entropy(logits, labels)
             return {"loss": loss, "logits": logits}
         return {"logits": logits}
 ```
@@ -310,7 +310,7 @@ Use `register_for_auto_class()` if you want the code files to be copied. If you 
 you don't need to call it. In cases where there's more than one auto class, you can modify the `config.json` directly using the 
 following structure:
 
-```
+```json
 "auto_map": {     
 	"AutoConfig": "<your-repo-name>--<config-name>",     
 	"AutoModel": "<your-repo-name>--<config-name>",
